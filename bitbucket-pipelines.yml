@@ -1,0 +1,34 @@
+#  Template Java Gradle build
+
+#  This template allows you to test and build your Java project with Gradle.
+#  The workflow allows running tests, code checkstyle and security scans on the default branch.
+
+# Prerequisites: appropriate project structure should exist in the repository.
+
+image: openjdk:11
+
+clone:
+  depth: full 
+
+definitions:
+  caches:
+    sonar: ~/.sonar/cache # Caching SonarCloud artifacts will speed up your build
+  steps:
+    - step: &continuous-integration
+        name: Build
+        caches:
+          - gradle
+          - sonar
+        script:
+          - chmod +x gradlew
+          - ./gradlew build sonarqube
+        artifacts:
+          - build/libs/**
+
+pipelines:
+  branches:
+    master:
+      - step: *continuous-integration
+
+    develop:
+      - step: *continuous-integration
